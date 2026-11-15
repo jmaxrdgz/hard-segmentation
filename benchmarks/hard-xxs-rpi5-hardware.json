@@ -1,0 +1,74 @@
+{
+  "model": "Raspberry Pi 5 Model B Rev 1.1",
+  "os_release": "PRETTY_NAME=\"Debian GNU/Linux 13 (trixie)\"\nNAME=\"Debian GNU/Linux\"\nVERSION_ID=\"13\"\nVERSION=\"13 (trixie)\"\nVERSION_CODENAME=trixie\nDEBIAN_VERSION_FULL=13.7\nID=debian\nHOME_URL=\"https://www.debian.org/\"\nSUPPORT_URL=\"https://www.debian.org/support\"\nBUG_REPORT_URL=\"https://bugs.debian.org/\"",
+  "kernel": "6.18.50+rpt-rpi-2712",
+  "cpu_info": "Architecture:                            aarch64\nCPU op-mode(s):                          32-bit, 64-bit\nByte Order:                              Little Endian\nCPU(s):                                  4\nOn-line CPU(s) list:                     0-3\nVendor ID:                               ARM\nModel name:                              Cortex-A76\nModel:                                   1\nThread(s) per core:                      1\nCore(s) per cluster:                     4\nSocket(s):                               -\nCluster(s):                              1\nStepping:                                r4p1\nFrequency boost:                         disabled\nCPU(s) scaling MHz:                      100%\nCPU max MHz:                             2400.0000\nCPU min MHz:                             1500.0000\nBogoMIPS:                                108.00\nFlags:                                   fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp\nL1d cache:                               256 KiB (4 instances)\nL1i cache:                               256 KiB (4 instances)\nL2 cache:                                2 MiB (4 instances)\nL3 cache:                                2 MiB (1 instance)\nNUMA node(s):                            8\nNUMA node0 CPU(s):                       0-3\nNUMA node1 CPU(s):                       0-3\nNUMA node2 CPU(s):                       0-3\nNUMA node3 CPU(s):                       0-3\nNUMA node4 CPU(s):                       0-3\nNUMA node5 CPU(s):                       0-3\nNUMA node6 CPU(s):                       0-3\nNUMA node7 CPU(s):                       0-3\nVulnerability Gather data sampling:      Not affected\nVulnerability Ghostwrite:                Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Old microcode:             Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Not affected\nVulnerability Spec rstack overflow:      Not affected\nVulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:                Mitigation; __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; CSV2, BHB\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Not affected\n",
+  "memory": "MemTotal:        8255824 kB\nMemFree:         1293760 kB\nMemAvailable:    4956608 kB\nBuffers:           85888 kB\nCached:          3519392 kB\nSwapCached:            0 kB\nActive:          3226928 kB\nInactive:        3367040 kB\nActive(anon):    3001856 kB\nInactive(anon):        0 kB\nActive(file):     225072 kB\nInactive(file):  3367040 kB\nUnevictable:           0 kB\nMlocked:               0 kB\nSwapTotal:       2097136 kB\nSwapFree:        2097136 kB\nZswap:                 0 kB\nZswapped:              0 kB\nDirty:              1840 kB\nWriteback:             0 kB\nAnonPages:       2987888 kB\nMapped:           159312 kB\nShmem:             13456 kB\nKReclaimable:     160672 kB\nSlab:             211600 kB\nSReclaimable:     160672 kB\nSUnreclaim:        50928 kB\nKernelStack:        2816 kB\nPageTables:         5632 kB\nSecPageTables:       112 kB\nNFS_Unstable:          0 kB\nBounce:                0 kB\nWritebackTmp:          0 kB\nCommitLimit:     6225040 kB\nCommitted_AS:     603216 kB\nVmallocTotal:   68447887360 kB\nVmallocUsed:       52128 kB\nVmallocChunk:          0 kB\nPercpu:              960 kB\nCmaTotal:          65536 kB\nCmaFree:           56320 kB\nBalloon:               0 kB",
+  "cpu_governors": {
+    "0": "ondemand",
+    "1": "ondemand",
+    "2": "ondemand",
+    "3": "ondemand"
+  },
+  "max_frequency_khz": "2400000",
+  "revision": "c894c5a8d64d34a1cd83a5396a2bc42e2b9a3719",
+  "transport": "SSH over Tailscale to configured rpi.local host (100.90.31.73)",
+  "runs": [
+    {
+      "result": "benchmarks/hard-xxs-rpi5-360x640.json",
+      "command": [
+        "taskset",
+        "-c",
+        "2,3",
+        "/home/jmaxrdgz/depth-cpu-bench/.venv/bin/python",
+        "hard_xxs/benchmark.py",
+        "--cpus",
+        "2,3",
+        "--threads",
+        "2",
+        "--height",
+        "360",
+        "--width",
+        "640",
+        "--classes",
+        "19",
+        "--warmup",
+        "30",
+        "--iterations",
+        "1000",
+        "--noise-images",
+        "1000",
+        "--output",
+        "benchmarks/hard-xxs-rpi5-360x640.json"
+      ]
+    },
+    {
+      "result": "benchmarks/hard-xxs-rpi5-192x640.json",
+      "command": [
+        "taskset",
+        "-c",
+        "2,3",
+        "/home/jmaxrdgz/depth-cpu-bench/.venv/bin/python",
+        "hard_xxs/benchmark.py",
+        "--cpus",
+        "2,3",
+        "--threads",
+        "2",
+        "--height",
+        "192",
+        "--width",
+        "640",
+        "--classes",
+        "19",
+        "--warmup",
+        "30",
+        "--iterations",
+        "1000",
+        "--noise-images",
+        "1000",
+        "--output",
+        "benchmarks/hard-xxs-rpi5-192x640.json"
+      ]
+    }
+  ]
+}
