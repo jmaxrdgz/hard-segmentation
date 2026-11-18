@@ -62,65 +62,65 @@ configuration, source hashes and runtime details. Source revision: `d979d3b`.
 
 ## Raspberry Pi 5 results
 
-XS and S passed the full eight-test suite on the Pi on 18 November 2026.
-Their measurements use the same protocol as below, with source revision
-`d979d3b`, PyTorch 2.14.1+cpu and Python 3.13.5. The Pi is a Raspberry Pi 5
-Model B Rev 1.1 with 8 GB RAM. Runs were sequential in fresh processes, with
+All three variants were measured on a Raspberry Pi 5 Model B Rev 1.1 with
+8 GB RAM, PyTorch 2.14.1+cpu and Python 3.13.5. XXS was measured on
+**15 November 2026** (source at `bc28f8e`); XS and S on **18 November 2026**
+(source revision `d979d3b`). XS and S passed the full eight-test suite on the Pi.
+
+All runs used two CPU cores (2-3), two intra-op threads, one inter-op thread,
+FP32 eager, batch one, random weights, 30 warmups and 1,000 timed forwards over
+1,000 distinct pregenerated inputs per resolution. Full-resolution 19-class
+logits are included in timing. Runs were sequential in fresh processes, with
 all native thread affinities verified as restricted to cores 2-3. The governor
 was `ondemand`, with a configured maximum CPU frequency of 2.4 GHz.
 
 | Model | 360x640 mean (ms) | 360x640 FPS | 192x640 mean (ms) | 192x640 FPS |
 | --- | ---: | ---: | ---: | ---: |
+| HARD-XXS | 326.84 | **3.06** | 171.26 | **5.84** |
 | HARD-XS | 762.35 | **1.31** | 417.16 | **2.40** |
 | HARD-S | 1,045.35 | **0.96** | 566.34 | **1.77** |
 
-**Active undervoltage/throttling was sampled during all four new Pi runs**.
-Recorded temperatures ranged from 34.5 to 54.9 C.
+XXS had no active throttling flags observed, with sampled clocks about 2.4 GHz;
+historical undervoltage/throttling flags were already set before its runs.
+**Active undervoltage/throttling was sampled during all four XS/S runs**.
+Recorded XS/S temperatures ranged from 34.5 to 54.9 C.
 
 | Model | Input | Samples with active power flags / telemetry samples |
 | --- | --- | ---: |
+| HARD-XXS | 360x640 | 0 / 35 |
+| HARD-XXS | 192x640 | 0 / 19 |
 | HARD-XS | 360x640 | 1 / 76 |
 | HARD-S | 360x640 | 10 / 103 |
 | HARD-XS | 192x640 | 5 / 43 |
 | HARD-S | 192x640 | 7 / 58 |
 
-These results describe the current power conditions, not a verified stable-power
-baseline. Sampling cannot establish the full duration or latency impact of events.
+The rows reflect their observed power conditions. XS/S results are not a verified
+stable-power baseline. Sampling cannot establish the full duration or latency impact
+of events.
 
-[XS 360x640 raw timings and telemetry](benchmarks/rpi5-2026-11-18-xs-360x640.json) |
+[XXS 360x640 raw timings and telemetry](benchmarks/rpi5-2026-11-15-xxs-360x640.json) |
+[XXS 192x640](benchmarks/rpi5-2026-11-15-xxs-192x640.json) |
+[XS 360x640](benchmarks/rpi5-2026-11-18-xs-360x640.json) |
 [S 360x640](benchmarks/rpi5-2026-11-18-s-360x640.json) |
 [XS 192x640](benchmarks/rpi5-2026-11-18-xs-192x640.json) |
 [S 192x640](benchmarks/rpi5-2026-11-18-s-192x640.json) |
-[Pi CSV summary](benchmarks/rpi5-2026-11-18-summary.csv) |
-[Pi hardware and exact commands](benchmarks/rpi5-2026-11-18-hardware.json).
+[XXS CSV summary](benchmarks/rpi5-2026-11-15-summary.csv) |
+[XS/S CSV summary](benchmarks/rpi5-2026-11-18-summary.csv) |
+[XXS hardware and exact commands](benchmarks/rpi5-2026-11-15-hardware.json) |
+[XS/S hardware and exact commands](benchmarks/rpi5-2026-11-18-hardware.json).
 
-All **ten new runs** (six M3 and four Pi) completed 1,000 timed forwards each.
+These are latency measurements of the reconstructions, not trained segmentation
+accuracy or camera throughput.
+
+The **ten 18 November runs** (six M3 and four Pi) completed 1,000 timed forwards each.
 Sample counts, mean/median/FPS calculations, source hashes, thread settings,
 input/output shapes and Pi native thread affinities were verified before
 publication. A [combined CSV](benchmarks/2026-11-18-summary.csv) includes timings
 and the available power/temperature sample summaries. No M3 power or temperature
 telemetry was collected; empty fields in its CSV rows indicate unavailable data.
 
-### Earlier HARD-XXS measurements
-
-Two CPU cores (2-3), two intra-op threads, one inter-op thread, FP32 eager,
-batch one, random weights, 30 warmups and 1,000 timed forwards over 1,000
-distinct pregenerated inputs per resolution. Full-resolution 19-class logits
-are included in timing.
-
-| Input (H x W) | Mean latency (ms) | FPS |
-| --- | ---: | ---: |
-| 360 x 640 | 326.84 | **3.06** |
-| 192 x 640 | 171.26 | **5.84** |
-
-Measured 15 November 2026. All sampled clocks were about 2.4 GHz, with no
-active throttling flags observed. Historical undervoltage/throttling flags
-were already set before the runs. These are latency measurements of this
-reconstruction, not trained segmentation accuracy or camera throughput.
-
 [Architecture, tests and reproduction commands](hard_segmentation/README.md) |
-[Raw results and telemetry](benchmarks/) |
-[CSV summary](benchmarks/rpi5-2026-11-15-summary.csv)
+[Raw results and telemetry](benchmarks/)
 
 ## Setup and test
 
