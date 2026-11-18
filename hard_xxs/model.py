@@ -1,8 +1,8 @@
-"""HARD-XXS paper reconstruction; inferred configuration, not author code.
+"""Embedded HARD paper reconstructions; inferred configurations, not author code.
 
 See README.md for every architectural assumption. Returns full-resolution logits.
 """
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 
 import torch
 from torch import nn
@@ -17,6 +17,21 @@ class Config:
     expansion: int = 4
     head_width: int = 32
     dilations: tuple[int, int, int] = (18, 12, 6)
+
+
+# Engineering presets, not configurations recovered from author code.
+PRESETS = {
+    'xxs': Config(),
+    'xs': Config(widths=(32, 48, 80), head_width=64),
+    's': Config(widths=(40, 64, 116), head_width=96),
+}
+
+
+def config_for_variant(variant, classes=19):
+    try:
+        return replace(PRESETS[variant.lower()], classes=classes)
+    except KeyError:
+        raise ValueError(f'unknown HARD variant: {variant!r}; choose {tuple(PRESETS)}') from None
 
 
 def conv_bn_relu(cin, cout, kernel=1, stride=1, dilation=1, groups=1):
@@ -91,3 +106,21 @@ class HARDXXS(nn.Module):
 
     def configuration(self):
         return asdict(self.config)
+
+
+class HARDXS(HARDXXS):
+    """HARD-XS reconstruction with the inferred XS preset by default."""
+    def __init__(self, config=None):
+        super().__init__(config_for_variant('xs') if config is None else config)
+
+
+class HARDS(HARDXXS):
+    """HARD-S reconstruction with the inferred S preset by default."""
+    def __init__(self, config=None):
+        super().__init__(config_for_variant('s') if config is None else config)
+
+
+def build_model(variant='xxs', classes=19):
+    config = config_for_variant(variant, classes)
+    model_class = {'xxs': HARDXXS, 'xs': HARDXS, 's': HARDS}[variant.lower()]
+    return model_class(config)

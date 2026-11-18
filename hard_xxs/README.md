@@ -1,8 +1,9 @@
-# HARD-XXS reconstruction
+# HARD-XXS, HARD-XS and HARD-S reconstructions
 
-Standalone PyTorch semantic segmentation implementation, with **109,571 trainable
-parameters** for 19 classes. This is a paper reconstruction with an inferred layer
-configuration. It is not official author code, a trained model, or a verified
+Standalone PyTorch semantic segmentation implementations, with **109,571 / 384,499 /
+751,467 trainable parameters** for XXS / XS / S with 19 classes. These are paper
+reconstructions with inferred layer configurations, not official author code,
+trained models, or a verified
 reproduction of the published accuracy or speed. A similar parameter count does
 not establish architectural equivalence.
 
@@ -10,12 +11,26 @@ Source: Kwon, Kim and Kim, ACCV 2024,
 [HARD paper](https://openaccess.thecvf.com/content/ACCV2024/papers/Kwon_HARD__Hardware-Aware_lightweight_Real-time_semantic_segmentation_model_Deployable_from_ACCV_2024_paper.pdf),
 sections 3.2-3.3 and Figures 2 and 5;
 [supplement](https://openaccess.thecvf.com/content/ACCV2024/supplemental/Kwon_HARD__Hardware-Aware_ACCV_2024_supplemental.pdf).
-These sources leave the XXS channel widths, repeats, expansion and detailed
+These sources leave the embedded variants' channel widths, repeats, expansion and detailed
 normalization/activation configuration unspecified. The earlier repository review
 located no author code or checkpoint. This implementation fills those gaps
 explicitly; changing them can change CPU latency substantially.
 
 ## Implemented architecture
+
+The table below details XXS. XS and S use the same operations and skip routing,
+with these explicitly inferred presets:
+
+| Variant | Widths at 1/2, 1/4, 1/8 | Repeats | Expansion | Classifier width | Parameters (19 classes) |
+| --- | --- | --- | ---: | ---: | ---: |
+| XXS | 16, 24, 40 | 1, 2, 3 | 4 | 32 | 109,571 |
+| XS | 32, 48, 80 | 1, 2, 3 | 4 | 64 | 384,499 |
+| S | 40, 64, 116 | 1, 2, 3 | 4 | 96 | 751,467 |
+
+These widths and classifier sizes approximate the nominal model sizes in the
+paper. Parameter proximity does not verify architectural equivalence. Repeats,
+expansion, normalization, activations, skip routing and dilation interpretation
+remain the same assumptions as the original XXS reconstruction below.
 
 | Component | Configuration | Output scale |
 | --- | --- | --- |
@@ -45,6 +60,9 @@ same decreasing dilation triplet, following Figure 2. The text alone is ambiguou
 about decreasing rates across modules versus inside each module.
 
 `Config` exposes widths, repeats, expansion, head width, classes and dilations.
+`build_model(variant, classes=19)` selects the `xxs`, `xs` or `s` preset; the public
+`HARDXXS`, `HARDXS` and `HARDS` classes also select their corresponding defaults.
+Supply `config_for_variant('s', classes=11)` to obtain a modified preset.
 No DAP module or GPU auxiliary heads are included in this embedded variant.
 The default returns `(N, 19, H, W)` logits, including for odd input dimensions.
 Training with cross-entropy and saving/loading a normal `state_dict` are supported.
@@ -65,6 +83,14 @@ A five-iteration local runner smoke check also passed. Its timing is not a Pi
 measurement and is deliberately not published as a performance result.
 The same four model tests subsequently passed on the Raspberry Pi 5.
 
+On 18 November 2026, the expanded **eight-test suite passed locally** for all
+three variants. It checks full 360x640 finite logits, odd-size forward and
+cross-entropy gradients for every parameter, per-variant checkpoint round-trips,
+the nine depthwise dilation settings, preset selection and XXS compatibility.
+XS and S also passed short benchmark-runner smoke checks, using the script and
+module entry points respectively. Pi validation for the new variants is pending
+because the SSH endpoint timed out; no XS/S Pi FPS is claimed.
+
 ## Two-core Raspberry Pi 5 benchmark
 
 Measured on **15 November 2026** on a **Raspberry Pi 5 Model B Rev 1.1, 8 GB**,
@@ -77,6 +103,10 @@ process. Original benchmark workspace revision: `c894c5a8d64d34a1cd83a5396a2bc42
 The code and results were subsequently moved to the standalone `jmaxrdgz/hard-xxs`
 repository. The recorded hashes verify the same model and benchmark source bytes;
 the archived commands and revision describe the original run before migration.
+Those original files remain available at commit `bc28f8e`. The later XS/S
+extension changes the shared source files but keeps the XXS layer configuration
+and state-dictionary layout compatible. Original XXS result files are retained
+without edits.
 
 | Input (H x W) | Parameters | Mean latency (ms) | FPS |
 | --- | ---: | ---: | ---: |
@@ -127,7 +157,10 @@ FP32 eager CPU, contiguous layout, random weights, seed zero, 30 warmups and 1,0
 timed forwards over 1,000 distinct pregenerated uniform-noise images. At 360x640,
 the inputs occupy about 2.76 GB (decimal) RAM; reduce `--noise-images` if necessary,
 and retain its value in reported results. The classifier produces 19 segmentation
-channels rather than the single depth channel of the other models in this repo.
+channels rather than the single depth channel of the separate depth benchmark repo.
+
+To measure the new variants with the same protocol, add `--variant xs` or
+`--variant s`, and use a separate output filename for each variant and resolution.
 
 Each result JSON includes all timings, mean/median/p90/p99 latency, FPS calculated
 as `1000 / mean_ms`, model configuration, source SHA256 hashes, PyTorch build,

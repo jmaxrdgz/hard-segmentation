@@ -14,9 +14,9 @@ from datetime import datetime, timezone
 import torch
 
 try:
-    from .model import Config, HARDXXS
+    from .model import PRESETS, build_model
 except ImportError:
-    from model import Config, HARDXXS
+    from model import PRESETS, build_model
 
 
 def positive(value):
@@ -50,6 +50,7 @@ def percentile(values, fraction):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--variant', choices=PRESETS, default='xxs')
     parser.add_argument('--height', type=positive, default=360)
     parser.add_argument('--width', type=positive, default=640)
     parser.add_argument('--classes', type=positive, default=19)
@@ -74,7 +75,7 @@ def main():
     torch.set_num_threads(args.threads)
     torch.set_num_interop_threads(1)
     torch.manual_seed(args.seed)
-    model = HARDXXS(Config(classes=args.classes)).cpu().eval()
+    model = build_model(args.variant, classes=args.classes).cpu().eval()
     inputs = [torch.rand(1, 3, args.height, args.width) for _ in range(args.noise_images)]
     samples, conditions = [], [telemetry()]
     last_sample = time.monotonic()
@@ -112,7 +113,8 @@ def main():
                for name in ('model.py', 'benchmark.py')}
     mean = statistics.mean(samples)
     result = {
-        'model': 'HARD-XXS reconstruction', 'official_equivalence_verified': False,
+        'model': f'HARD-{args.variant.upper()} reconstruction',
+        'variant': args.variant, 'official_equivalence_verified': False,
         'weights': 'random; no accuracy claim', 'configuration': model.configuration(),
         'parameters': sum(p.numel() for p in model.parameters()),
         'environment': {'host': platform.node(), 'platform': platform.platform(),
