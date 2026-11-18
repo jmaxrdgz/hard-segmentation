@@ -1,4 +1,4 @@
-# HARD embedded segmentation models
+# HARD segmentation
 
 Standalone PyTorch reconstructions of HARD-XXS, HARD-XS and HARD-S semantic
 segmentation. Unspecified architecture choices are
@@ -29,12 +29,38 @@ with torch.inference_mode():
 19-class models. `Config()` and the default benchmark still select XXS.
 The `hard_xxs` package name is retained for existing imports and XXS checkpoints.
 
+## Apple M3 results
+
+Measured on this computer on **18 November 2026**: Apple M3, 8 GB RAM,
+macOS 15.7.3, FP32 PyTorch CPU, two intra-op threads and one inter-op thread,
+batch one, random weights, contiguous layout. Each variant and resolution ran
+sequentially in a fresh process with 30 warmups and 1,000 timed forwards over
+1,000 distinct pregenerated inputs. macOS scheduling was not pinned to cores.
+Timing includes the full-resolution 19-class logit resize, excluding input
+generation, preprocessing and argmax.
+
+| Model | 360x640 mean (ms) | 360x640 FPS | 192x640 mean (ms) | 192x640 FPS |
+| --- | ---: | ---: | ---: | ---: |
+| HARD-XXS | 68.10 | **14.68** | 39.63 | **25.23** |
+| HARD-XS | 141.93 | **7.05** | 72.49 | **13.79** |
+| HARD-S | 211.77 | **4.72** | 115.85 | **8.63** |
+
+These are observed timings on the current desktop. A summary-file write initially
+failed with low disk space after all six benchmark processes had exited
+successfully; it succeeded on retry. Post-run swap was in use. No per-frame
+memory-pressure telemetry was captured, so the effect of swapping on latency
+cannot be established. All raw JSON records were validated and preserved.
+
+[M3 CSV summary](benchmarks/m3-2026-11-18-summary.csv) |
+[M3 hardware, exact commands and post-run conditions](benchmarks/m3-2026-11-18-hardware.json).
+The six `m3-2026-11-18-{variant}-{height}x640.json` files contain all timings,
+configuration, source hashes and runtime details. Source revision: `d979d3b`.
+
 ## Raspberry Pi 5 results
 
-The results below are for **HARD-XXS**. XS and S have passed local forward,
-training-gradient, checkpoint and benchmark-runner checks. Their Pi FPS is
-**not yet measured**: the configured Pi SSH endpoint timed out on 18 November
-2026. No local smoke timing is presented as Pi performance.
+The results below are for **HARD-XXS**. XS and S passed the full eight-test suite
+on the Pi on 18 November 2026, and their full benchmark runs are in progress.
+No local smoke timing is presented as Pi performance.
 
 Two CPU cores (2-3), two intra-op threads, one inter-op thread, FP32 eager,
 batch one, random weights, 30 warmups and 1,000 timed forwards over 1,000

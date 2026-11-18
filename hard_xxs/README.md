@@ -88,8 +88,9 @@ three variants. It checks full 360x640 finite logits, odd-size forward and
 cross-entropy gradients for every parameter, per-variant checkpoint round-trips,
 the nine depthwise dilation settings, preset selection and XXS compatibility.
 XS and S also passed short benchmark-runner smoke checks, using the script and
-module entry points respectively. Pi validation for the new variants is pending
-because the SSH endpoint timed out; no XS/S Pi FPS is claimed.
+module entry points respectively. The full eight-test suite subsequently passed
+on the Pi on 18 November 2026. Full XS/S Pi benchmark runs are in progress.
+All three variants have completed the M3 benchmark; see the [results table](../README.md).
 
 ## Two-core Raspberry Pi 5 benchmark
 
@@ -100,7 +101,7 @@ two intra-op threads, one inter-op thread, batch one, FP32 eager CPU, random
 weights, contiguous memory format, 30 warmups and **1,000 timed forwards over
 1,000 distinct pregenerated inputs**. Runs were sequential, each in a fresh
 process. Original benchmark workspace revision: `c894c5a8d64d34a1cd83a5396a2bc42e2b9a3719`.
-The code and results were subsequently moved to the standalone `jmaxrdgz/hard-xxs`
+The code and results were subsequently moved to the standalone `jmaxrdgz/hard-segmentation`
 repository. The recorded hashes verify the same model and benchmark source bytes;
 the archived commands and revision describe the original run before migration.
 Those original files remain available at commit `bc28f8e`. The later XS/S
