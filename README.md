@@ -58,9 +58,24 @@ configuration, source hashes and runtime details. Source revision: `d979d3b`.
 
 ## Raspberry Pi 5 results
 
-The results below are for **HARD-XXS**. XS and S passed the full eight-test suite
-on the Pi on 18 November 2026, and their full benchmark runs are in progress.
-No local smoke timing is presented as Pi performance.
+XS and S passed the full eight-test suite on the Pi on 18 November 2026.
+Their completed 360x640 measurements use the same protocol as below, with
+source revision `d979d3b`, PyTorch 2.14.1+cpu and Python 3.13.5.
+
+| Model | 360x640 mean (ms) | 360x640 FPS | 192x640 |
+| --- | ---: | ---: | --- |
+| HARD-XS | 762.35 | **1.31** | In progress |
+| HARD-S | 1,045.35 | **0.96** | In progress |
+
+**Active undervoltage/throttling was sampled during both new Pi runs**:
+1 of 76 telemetry samples for XS and 10 of 103 for S reported active flags.
+These results describe the current power conditions, not a verified stable-power
+baseline. Sampling cannot establish the full duration or latency impact of events.
+
+[XS 360x640 raw timings and telemetry](benchmarks/rpi5-2026-11-18-xs-360x640.json) |
+[S 360x640 raw timings and telemetry](benchmarks/rpi5-2026-11-18-s-360x640.json).
+
+### Earlier HARD-XXS measurements
 
 Two CPU cores (2-3), two intra-op threads, one inter-op thread, FP32 eager,
 batch one, random weights, 30 warmups and 1,000 timed forwards over 1,000
