@@ -2,7 +2,7 @@
 
 Standalone PyTorch reconstructions of HARD-XXS, HARD-XS and HARD-S semantic
 segmentation. Unspecified architecture choices are
-[documented explicitly](hard_xxs/README.md). This is not author code or a
+[documented explicitly](hard_segmentation/README.md). This is not author code or a
 verified reproduction of the paper's accuracy. No trained weights are included.
 
 | Variant | Encoder widths | Encoder repeats | Expansion | Classifier width | Parameters (19 classes) |
@@ -18,7 +18,7 @@ paper's nominal parameter budgets, not recovered author configurations.
 
 ```python
 import torch
-from hard_xxs import HARDXXS, HARDXS, HARDS, build_model
+from hard_segmentation import HARDXXS, HARDXS, HARDS, build_model
 
 model = build_model('xs', classes=19).eval()  # 'xxs', 'xs', or 's'
 with torch.inference_mode():
@@ -27,7 +27,10 @@ with torch.inference_mode():
 
 `HARDXXS()`, `HARDXS()` and `HARDS()` construct the corresponding default
 19-class models. `Config()` and the default benchmark still select XXS.
-The `hard_xxs` package name is retained for existing imports and XXS checkpoints.
+The shared implementation is `hard_segmentation/models.py`, with a generic
+`HARD` base and the three variant classes. Tests live in
+`hard_segmentation/test_models.py`. Imports now use `hard_segmentation`;
+model state-dictionary keys and tensor shapes are unchanged.
 
 ## Apple M3 results
 
@@ -115,9 +118,9 @@ active throttling flags observed. Historical undervoltage/throttling flags
 were already set before the runs. These are latency measurements of this
 reconstruction, not trained segmentation accuracy or camera throughput.
 
-[Architecture, tests and reproduction commands](hard_xxs/README.md) |
+[Architecture, tests and reproduction commands](hard_segmentation/README.md) |
 [Raw results and telemetry](benchmarks/) |
-[CSV summary](benchmarks/hard-xxs-rpi5-summary.csv)
+[CSV summary](benchmarks/rpi5-2026-11-15-summary.csv)
 
 ## Setup and test
 
@@ -128,13 +131,13 @@ From the repository root:
 ```bash
 python3 -m venv .venv
 .venv/bin/python -m pip install torch
-.venv/bin/python -m unittest hard_xxs.test_model -v
+.venv/bin/python -m unittest hard_segmentation.test_models -v
 ```
 
 Run on the Pi:
 
 ```bash
-taskset -c 2,3 .venv/bin/python hard_xxs/benchmark.py \
+taskset -c 2,3 .venv/bin/python hard_segmentation/benchmark.py \
   --variant xs --cpus 2,3 --threads 2 --height 360 --width 640 --classes 19 \
   --warmup 30 --iterations 1000 --noise-images 1000 \
   --output benchmarks/new-xs-rpi5-360x640.json
@@ -147,3 +150,5 @@ source hashes, individual timings and telemetry.
 The original run commands and revision in the archived metadata predate
 this repository migration. The archived XXS records are unchanged; their source
 hashes refer to the files at commit `bc28f8e`, before the XS/S extension.
+Archived commands retain their original paths; see the
+[benchmark filename and provenance notes](benchmarks/README.md) for the rename map.

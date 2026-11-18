@@ -3,7 +3,7 @@ import unittest
 import torch
 from torch import nn
 
-from hard_xxs.model import Config, HARDXXS, HARDXS, HARDS, PRESETS, build_model
+from hard_segmentation.models import Config, HARD, HARDXXS, HARDXS, HARDS, PRESETS, build_model
 
 
 class ModelTests(unittest.TestCase):
@@ -50,6 +50,7 @@ class ModelTests(unittest.TestCase):
         for variant, expected_class in [('xxs', HARDXXS), ('xs', HARDXS), ('s', HARDS)]:
             with self.subTest(variant=variant):
                 model = build_model(variant, classes=11).train()
+                self.assertIsInstance(model, HARD)
                 self.assertIsInstance(model, expected_class)
                 logits = model(torch.randn(2, 3, 65, 97))
                 self.assertEqual(tuple(logits.shape), (2, 11, 65, 97))

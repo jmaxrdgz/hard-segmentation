@@ -73,7 +73,7 @@ There is no training pipeline, dataset or pretrained checkpoint in this addition
 From the repository root, using the existing PyTorch environment:
 
 ```bash
-.venv/bin/python -m unittest hard_xxs.test_model -v
+.venv/bin/python -m unittest hard_segmentation.test_models -v
 ```
 
 Four tests passed locally on 15 November 2026: full 360x640 output and finite
@@ -117,6 +117,9 @@ Those original files remain available at commit `bc28f8e`. The later XS/S
 extension changes the shared source files but keeps the XXS layer configuration
 and state-dictionary layout compatible. Original XXS result files are retained
 without edits.
+Their filenames now follow the common host/date/variant convention; the
+[benchmark provenance notes](../benchmarks/README.md) map the original filenames
+and explain the historical source paths and hashes.
 
 | Input (H x W) | Parameters | Mean latency (ms) | FPS |
 | --- | ---: | ---: | ---: |
@@ -130,10 +133,10 @@ active flags observed. Sampled temperatures were 44.4-54.9 C at 360x640 and
 50.5-56.0 C at 192x640. The governor was `ondemand`. Sampling does not rule out
 brief events between measurements; the historical flags predate these runs.
 
-Records: [360x640 timings and telemetry](../benchmarks/hard-xxs-rpi5-360x640.json),
-[192x640 timings and telemetry](../benchmarks/hard-xxs-rpi5-192x640.json),
-[CSV summary](../benchmarks/hard-xxs-rpi5-summary.csv), and
-[hardware and exact commands](../benchmarks/hard-xxs-rpi5-hardware.json).
+Records: [360x640 timings and telemetry](../benchmarks/rpi5-2026-11-15-xxs-360x640.json),
+[192x640 timings and telemetry](../benchmarks/rpi5-2026-11-15-xxs-192x640.json),
+[CSV summary](../benchmarks/rpi5-2026-11-15-summary.csv), and
+[hardware and exact commands](../benchmarks/rpi5-2026-11-15-hardware.json).
 Each JSON contains all 1,000 frame timings and source hashes. Sample counts,
 source hashes, mean/FPS calculations, thread settings and all recorded thread
 affinities were checked before publication.
@@ -145,20 +148,20 @@ The runner depends only on PyTorch and the Python standard library. In a Pi
 checkout of this repository with a PyTorch environment at `.venv`:
 
 ```bash
-taskset -c 2,3 .venv/bin/python hard_xxs/benchmark.py \
+taskset -c 2,3 .venv/bin/python hard_segmentation/benchmark.py \
   --cpus 2,3 --threads 2 --height 360 --width 640 --classes 19 \
   --warmup 30 --iterations 1000 --noise-images 1000 \
-  --output benchmarks/hard-xxs-rpi5-360x640.json
+  --output benchmarks/rpi5-2026-11-15-xxs-360x640.json
 ```
 
 For comparison with the existing depth CPU timings, run a fresh process at
 192x640 as well:
 
 ```bash
-taskset -c 2,3 .venv/bin/python hard_xxs/benchmark.py \
+taskset -c 2,3 .venv/bin/python hard_segmentation/benchmark.py \
   --cpus 2,3 --threads 2 --height 192 --width 640 --classes 19 \
   --warmup 30 --iterations 1000 --noise-images 1000 \
-  --output benchmarks/hard-xxs-rpi5-192x640.json
+  --output benchmarks/rpi5-2026-11-15-xxs-192x640.json
 ```
 
 These commands pin the entire process before PyTorch imports and verify native

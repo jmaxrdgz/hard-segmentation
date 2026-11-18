@@ -14,9 +14,9 @@ from datetime import datetime, timezone
 import torch
 
 try:
-    from .model import PRESETS, build_model
+    from .models import PRESETS, build_model
 except ImportError:
-    from model import PRESETS, build_model
+    from models import PRESETS, build_model
 
 
 def positive(value):
@@ -110,7 +110,7 @@ def main():
             raise RuntimeError('a native thread escaped requested CPUs; launch with taskset')
     root = Path(__file__).resolve().parent
     sources = {name: hashlib.sha256((root / name).read_bytes()).hexdigest()
-               for name in ('model.py', 'benchmark.py')}
+               for name in ('models.py', 'benchmark.py')}
     mean = statistics.mean(samples)
     result = {
         'model': f'HARD-{args.variant.upper()} reconstruction',

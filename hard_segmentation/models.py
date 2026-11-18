@@ -70,8 +70,8 @@ class SerializedAtrous(nn.Module):
         return torch.cat((x, self.blocks(x)), dim=1)
 
 
-class HARDXXS(nn.Module):
-    """Configurable, trainable reconstruction with a stride-four segmentation head."""
+class HARD(nn.Module):
+    """Shared embedded HARD architecture with a stride-four segmentation head."""
     def __init__(self, config=Config()):
         super().__init__()
         if (config.classes < 1 or config.expansion < 1 or config.head_width < 1
@@ -108,13 +108,19 @@ class HARDXXS(nn.Module):
         return asdict(self.config)
 
 
-class HARDXS(HARDXXS):
+class HARDXXS(HARD):
+    """HARD-XXS reconstruction with the inferred XXS preset by default."""
+    def __init__(self, config=None):
+        super().__init__(config_for_variant('xxs') if config is None else config)
+
+
+class HARDXS(HARD):
     """HARD-XS reconstruction with the inferred XS preset by default."""
     def __init__(self, config=None):
         super().__init__(config_for_variant('xs') if config is None else config)
 
 
-class HARDS(HARDXXS):
+class HARDS(HARD):
     """HARD-S reconstruction with the inferred S preset by default."""
     def __init__(self, config=None):
         super().__init__(config_for_variant('s') if config is None else config)
