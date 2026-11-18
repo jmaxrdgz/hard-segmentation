@@ -89,10 +89,19 @@ cross-entropy gradients for every parameter, per-variant checkpoint round-trips,
 the nine depthwise dilation settings, preset selection and XXS compatibility.
 XS and S also passed short benchmark-runner smoke checks, using the script and
 module entry points respectively. The full eight-test suite subsequently passed
-on the Pi on 18 November 2026. Full XS/S Pi benchmark runs are in progress.
-All three variants have completed the M3 benchmark; see the [results table](../README.md).
+on the Pi on 18 November 2026. All three variants completed M3 benchmarks and
+XS/S completed Pi benchmarks at both 360x640 and 192x640, with 1,000 timed
+forwards per configuration; see the [results tables](../README.md).
 
-## Two-core Raspberry Pi 5 benchmark
+The 18 November runs use two intra-op threads and one inter-op thread, FP32
+eager CPU, batch one, random weights, 30 warmups and 1,000 distinct pregenerated
+inputs. Pi threads are pinned to cores 2-3; M3 threads use macOS scheduling.
+All four new Pi runs captured active undervoltage/throttling flags, and the M3
+had low disk space and swap in use after its runs. These observed conditions
+are documented with the results. The [combined CSV](../benchmarks/2026-11-18-summary.csv)
+and per-run JSON files preserve the measurements and provenance.
+
+## Earlier XXS two-core Raspberry Pi 5 benchmark
 
 Measured on **15 November 2026** on a **Raspberry Pi 5 Model B Rev 1.1, 8 GB**,
 over Tailscale SSH. Debian 13.7 ARM64, Linux 6.18.50+rpt-rpi-2712,

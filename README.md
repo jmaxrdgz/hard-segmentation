@@ -32,7 +32,8 @@ The `hard_xxs` package name is retained for existing imports and XXS checkpoints
 ## Apple M3 results
 
 Measured on this computer on **18 November 2026**: Apple M3, 8 GB RAM,
-macOS 15.7.3, FP32 PyTorch CPU, two intra-op threads and one inter-op thread,
+macOS 15.7.3, Python 3.13.3, PyTorch 2.14.1, FP32 CPU,
+two intra-op threads and one inter-op thread,
 batch one, random weights, contiguous layout. Each variant and resolution ran
 sequentially in a fresh process with 30 warmups and 1,000 timed forwards over
 1,000 distinct pregenerated inputs. macOS scheduling was not pinned to cores.
@@ -59,21 +60,43 @@ configuration, source hashes and runtime details. Source revision: `d979d3b`.
 ## Raspberry Pi 5 results
 
 XS and S passed the full eight-test suite on the Pi on 18 November 2026.
-Their completed 360x640 measurements use the same protocol as below, with
-source revision `d979d3b`, PyTorch 2.14.1+cpu and Python 3.13.5.
+Their measurements use the same protocol as below, with source revision
+`d979d3b`, PyTorch 2.14.1+cpu and Python 3.13.5. The Pi is a Raspberry Pi 5
+Model B Rev 1.1 with 8 GB RAM. Runs were sequential in fresh processes, with
+all native thread affinities verified as restricted to cores 2-3. The governor
+was `ondemand`, with a configured maximum CPU frequency of 2.4 GHz.
 
-| Model | 360x640 mean (ms) | 360x640 FPS | 192x640 |
-| --- | ---: | ---: | --- |
-| HARD-XS | 762.35 | **1.31** | In progress |
-| HARD-S | 1,045.35 | **0.96** | In progress |
+| Model | 360x640 mean (ms) | 360x640 FPS | 192x640 mean (ms) | 192x640 FPS |
+| --- | ---: | ---: | ---: | ---: |
+| HARD-XS | 762.35 | **1.31** | 417.16 | **2.40** |
+| HARD-S | 1,045.35 | **0.96** | 566.34 | **1.77** |
 
-**Active undervoltage/throttling was sampled during both new Pi runs**:
-1 of 76 telemetry samples for XS and 10 of 103 for S reported active flags.
+**Active undervoltage/throttling was sampled during all four new Pi runs**.
+Recorded temperatures ranged from 34.5 to 54.9 C.
+
+| Model | Input | Samples with active power flags / telemetry samples |
+| --- | --- | ---: |
+| HARD-XS | 360x640 | 1 / 76 |
+| HARD-S | 360x640 | 10 / 103 |
+| HARD-XS | 192x640 | 5 / 43 |
+| HARD-S | 192x640 | 7 / 58 |
+
 These results describe the current power conditions, not a verified stable-power
 baseline. Sampling cannot establish the full duration or latency impact of events.
 
 [XS 360x640 raw timings and telemetry](benchmarks/rpi5-2026-11-18-xs-360x640.json) |
-[S 360x640 raw timings and telemetry](benchmarks/rpi5-2026-11-18-s-360x640.json).
+[S 360x640](benchmarks/rpi5-2026-11-18-s-360x640.json) |
+[XS 192x640](benchmarks/rpi5-2026-11-18-xs-192x640.json) |
+[S 192x640](benchmarks/rpi5-2026-11-18-s-192x640.json) |
+[Pi CSV summary](benchmarks/rpi5-2026-11-18-summary.csv) |
+[Pi hardware and exact commands](benchmarks/rpi5-2026-11-18-hardware.json).
+
+All **ten new runs** (six M3 and four Pi) completed 1,000 timed forwards each.
+Sample counts, mean/median/FPS calculations, source hashes, thread settings,
+input/output shapes and Pi native thread affinities were verified before
+publication. A [combined CSV](benchmarks/2026-11-18-summary.csv) includes timings
+and the available power/temperature sample summaries. No M3 power or temperature
+telemetry was collected; empty fields in its CSV rows indicate unavailable data.
 
 ### Earlier HARD-XXS measurements
 
@@ -98,8 +121,9 @@ reconstruction, not trained segmentation accuracy or camera throughput.
 
 ## Setup and test
 
-Requires Python 3.10+ and PyTorch. The published runs used Python 3.13.5
-and PyTorch 2.14.1+cpu. From the repository root:
+Requires Python 3.10+ and PyTorch. The Pi runs used Python 3.13.5 and
+PyTorch 2.14.1+cpu; the M3 runs used Python 3.13.3 and PyTorch 2.14.1.
+From the repository root:
 
 ```bash
 python3 -m venv .venv
